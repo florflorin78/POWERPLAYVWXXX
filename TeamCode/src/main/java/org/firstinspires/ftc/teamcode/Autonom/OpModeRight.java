@@ -192,7 +192,7 @@ public class OpModeRight extends LinearOpMode  {
 
         else if(autoCase == 3) {
             telemetry.addData("Status", "CAZ 3");
-            DreaptaDist(0.5, 1400);
+            DreaptaDist(0.5, 1550);
         }
 
 
