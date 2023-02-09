@@ -169,23 +169,32 @@ public class OpModeRight extends LinearOpMode  {
         //dr 550
         //dr 1200
 
-//        GhearaInchide();
-//        LIFTURCAT(0.5, 250);
-//        DreaptaInainte45Dist(0.6, 480);
-//        InainteDist(0.5, 2050);
-//        LIFTURCAT(0.55, 1440);
-//        StangaDist(0.5, 585);
-//        InainteDist(0.5, 200);
-//        GhearaDeschide();
-//        InapoiDist(0.5, 200);
-//        InvarteDreaptaDist(0.5, 1000);
-//        LIFTCOBORAT(0.5, 1000);
-//        InainteDist(0.5, 1400);
-//        GhearaInchide();
-//        InapoiDist(0.5, 2500);
-//
+        GhearaInchide();
+        LIFTURCAT(0.5, 250);
+        DreaptaInainte45Dist(0.6, 480);
+        InainteDist(0.5, 2050);
+        LIFTURCAT(0.55, 1550);
+        StangaDist(0.5, 560);
+        InainteDist(0.5, 200);
+        GhearaDeschide();
+        InapoiDist(0.5, 200);
 
+        if(autoCase == 1) {
+            telemetry.addData("Status", "CAZ 1 - LEFT");
 
+            StangaDist(0.5, 550);
+        }
+
+        else if(autoCase == 2) {
+            telemetry.addData("Status", "CAZ 2");
+
+            DreaptaDist(0.5, 550);
+        }
+
+        else if(autoCase == 3) {
+            telemetry.addData("Status", "CAZ 3");
+            DreaptaDist(0.5, 1400);
+        }
 
 
 
@@ -265,8 +274,8 @@ public class OpModeRight extends LinearOpMode  {
             LiftTargetStanga = LiftStanga.getCurrentPosition();
             LiftTargetDreapta = LiftDreapta.getCurrentPosition();
 
-            LiftStanga.setTargetPosition(distance);
-            LiftDreapta.setTargetPosition(distance);
+            LiftStanga.setTargetPosition(-distance);
+            LiftDreapta.setTargetPosition(-distance);
 
             LiftStanga.setMode(DcMotor.RunMode.RUN_TO_POSITION);
             LiftDreapta.setMode(DcMotor.RunMode.RUN_TO_POSITION);
