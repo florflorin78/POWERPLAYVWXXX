@@ -157,7 +157,6 @@ public class OpModeRight extends LinearOpMode  {
 
 
         waitForStart();
-        AsteaptaVirtual();
 
         /*
     YELLOW  = Parking Left
@@ -173,21 +172,21 @@ public class OpModeRight extends LinearOpMode  {
         LIFTURCAT(0.5, 250);
         DreaptaInainte45Dist(0.6, 480);
         InainteDist(0.5, 2050);
-        LIFTURCAT(0.55, 1550);
-        StangaDist(0.5, 560);
+        LIFTURCAT(0.55, 1480);
+        StangaDist(0.5, 585);
         InainteDist(0.5, 200);
+        sleep(1000);
         GhearaDeschide();
         InapoiDist(0.5, 200);
 
+
         if(autoCase == 1) {
             telemetry.addData("Status", "CAZ 1 - LEFT");
-
             StangaDist(0.5, 550);
         }
 
         else if(autoCase == 2) {
             telemetry.addData("Status", "CAZ 2");
-
             DreaptaDist(0.5, 550);
         }
 
@@ -195,8 +194,6 @@ public class OpModeRight extends LinearOpMode  {
             telemetry.addData("Status", "CAZ 3");
             DreaptaDist(0.5, 1400);
         }
-
-
 
 
 //        LIFTURCAT(0.5, 1000);
