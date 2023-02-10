@@ -22,7 +22,7 @@ import java.util.ArrayList;
     MAGENTA = Parking Right
      */
 
-@Autonomous(name="OpModeRight")
+@Autonomous(name="1AUTORIGHT")
 ///@Disabled
 public class OpModeRight extends LinearOpMode  {
 

@@ -6,12 +6,10 @@ import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.util.ElapsedTime;
-
-import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
-import org.firstinspires.ftc.teamcode.Odometry;
-import org.firstinspires.ftc.teamcode.camera.AprilTagDetectionPipeline;
-import org.firstinspires.ftc.teamcode.camera.SleeveDetection;
 import org.openftc.apriltag.AprilTagDetection;
+import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
+import org.firstinspires.ftc.teamcode.camera.AprilTagDetectionPipeline;
+import org.firstinspires.ftc.teamcode.camera.Detection;
 import org.openftc.easyopencv.OpenCvCamera;
 import org.openftc.easyopencv.OpenCvCameraFactory;
 import org.openftc.easyopencv.OpenCvCameraRotation;
@@ -24,21 +22,21 @@ import java.util.ArrayList;
     MAGENTA = Parking Right
      */
 
-@Autonomous(name="OpModeLeft")
+@Autonomous(name="1AUTOLEFT")
 ///@Disabled
 public class OpModeLeft extends LinearOpMode  {
 
     static final double FEET_PER_METER = 3.28084;
 
     public ElapsedTime runtime = new ElapsedTime();
-    public DcMotor LeftFront;
-    public DcMotor LeftBack;
-    public DcMotor RightFront;
-    public DcMotor RightBack;
+    public DcMotor LeftFront = null;
+    public DcMotor LeftBack = null;
+    public DcMotor RightFront = null;
+    public DcMotor RightBack = null;
     public DcMotor LiftStanga = null;
     public DcMotor LiftDreapta = null;
-    public Servo ServoStanga;
-    public Servo ServoDreapta;
+    public Servo ServoStanga = null;
+    public Servo ServoDreapta = null;
 
     double fx = 578.272;
     double fy = 578.272;
@@ -51,11 +49,12 @@ public class OpModeLeft extends LinearOpMode  {
     int Middle = 2;
     int Right = 3;
 
+    int autoCase = 2;
+
     boolean GhearaB= false;
-    double GhearaValStangaOpen = 0.63;
-    double GhearaValStangaClosed = 0.48;
-    double GhearaValDreaptaOpen = 0.63;
-    double GhearaValDreaptaClosed = 0.48;
+
+    double closeClaw = 0.37;
+    double openClaw = 0.63; //0.53
 
     AprilTagDetectionPipeline aprilTagDetectionPipeline;
     OpenCvCamera camera;
@@ -114,8 +113,8 @@ public class OpModeLeft extends LinearOpMode  {
         LiftDreapta.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         LiftStanga.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
-        ServoStanga.setPosition(GhearaValStangaClosed);
-        ServoDreapta.setPosition(GhearaValDreaptaClosed);
+        ServoStanga.setPosition(closeClaw);
+        ServoDreapta.setPosition(closeClaw);
 
         int cameraMonitorViewId = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
         camera = OpenCvCameraFactory.getInstance().createWebcam(hardwareMap.get(WebcamName.class, "Webcam 1"), cameraMonitorViewId);
@@ -127,82 +126,37 @@ public class OpModeLeft extends LinearOpMode  {
             @Override
             public void onOpened()
             {
-                camera.startStreaming(320,240, OpenCvCameraRotation.SIDEWAYS_LEFT);
+                camera.startStreaming(800,448, OpenCvCameraRotation.UPRIGHT);
             }
 
             @Override
             public void onError(int errorCode) {}
         });
 
-        while (!isStarted()) {
+        while (!isStarted() && !isStopRequested())
+        {
             ArrayList<AprilTagDetection> currentDetections = aprilTagDetectionPipeline.getLatestDetections();
 
             if(currentDetections.size() != 0)
             {
-                boolean tagFound = false;
-
                 for(AprilTagDetection tag : currentDetections)
                 {
-                    if(tag.id == Left || tag.id == Middle || tag.id == Right)
-                    {
-                        tagOfInterest = tag;
-                        tagFound = true;
-                        break;
-                    }
-                }
-
-                if(tagFound)
-                {
-                    telemetry.addLine("Tag of interest is in sight!\n\nLocation data:");
-                    tagToTelemetry(tagOfInterest);
-                    if(tagOfInterest.id == Left)
-                        telemetry.addData("Status", "CAZ 1 - Left");
-                    else if(tagOfInterest.id == Middle)
-                        telemetry.addData("Status", "CAZ 2 - Middle");
-                    else if(tagOfInterest.id == Right)
-                        telemetry.addData("Status", "CAZ 3 - Right");
-                }
-                else
-                {
-                    telemetry.addLine("Don't see tag of interest :(");
-
-                    if(tagOfInterest == null)
-                    {
-                        telemetry.addLine("(The tag has never been seen)");
-                    }
-                    else
-                    {
-                        telemetry.addLine("\nBut we HAVE seen the tag before; last seen at:");
-                        tagToTelemetry(tagOfInterest);
-                    }
+                    autoCase = tag.id;
+                    telemetry.addData("Id", autoCase);
+                    break;
                 }
 
             }
-            else
-            {
-                telemetry.addLine("Don't see tag of interest :(");
-
-                if(tagOfInterest == null)
-                {
-                    telemetry.addLine("(The tag has never been seen)");
-                }
-                else
-                {
-                    telemetry.addLine("\nBut we HAVE seen the tag before; last seen at:");
-                    tagToTelemetry(tagOfInterest);
-                }
-
-            }
-
-            telemetry.update();
             sleep(20);
+            telemetry.update();
         }
+
 
         telemetry.addData("Status", "S-a initializat fratic");
         telemetry.update();
 
+
         waitForStart();
-        AsteaptaVirtual();
 
         /*
     YELLOW  = Parking Left
@@ -210,61 +164,62 @@ public class OpModeLeft extends LinearOpMode  {
     MAGENTA = Parking Right
      */
 
-        if(tagOfInterest == null || tagOfInterest.id == Left) {
-            telemetry.addData("Status", "CAZ 1");
+        //st 550
+        //dr 550
+        //dr 1200
+
+        GhearaInchide();
+        LIFTURCAT(0.5, 250);
+        StangaInainte45Dist(0.6, 480);
+        InainteDist(0.5, 2050);
+        LIFTURCAT(0.55, 1480);
+        DreaptaDist(0.5, 585);
+        InainteDist(0.5, 200);
+        sleep(1000);
+        GhearaDeschide();
+        InapoiDist(0.5, 200);
 
 
-            GhearaInchide();
-            LIFTURCAT(0.5, 250);
-            DreaptaInainte45Dist(0.6, 430);
-            InainteDist(0.5, 1980);
-            LIFTURCAT(1, 5150);
-            DreaptaDist(0.5, 590);
-            InainteDist(0.5, 220);
-            GhearaDeschide();
-            InapoiDist(0.5, 200);
-            StangaDist(0.5, 2100);
-            InapoiDist(0.5, 920);
-
+        if(autoCase == 1) {
+            telemetry.addData("Status", "CAZ 1 - LEFT");
+            DreaptaDist(0.5, 550);
         }
 
-        else if(tagOfInterest.id == Middle) {
+        else if(autoCase == 2) {
             telemetry.addData("Status", "CAZ 2");
-
-            GhearaInchide();
-            LIFTURCAT(0.5, 250);
-            DreaptaInainte45Dist(0.6, 430);
-            InainteDist(0.5, 1980);
-            LIFTURCAT(1, 5150);
-            DreaptaDist(0.5, 576);
-            InainteDist(0.5, 220);
-            GhearaDeschide();
-            InapoiDist(0.5, 200);
-            StangaDist(0.5, 760);
-            InapoiDist(0.5, 920);
-
+            StangaDist(0.5, 550);
         }
 
-        else if(tagOfInterest.id == Right) {
+        else if(autoCase == 3) {
             telemetry.addData("Status", "CAZ 3");
-
-            GhearaInchide();
-            LIFTURCAT(0.5, 250);
-            DreaptaInainte45Dist(0.6, 430);
-            InainteDist(0.5, 1980);
-            LIFTURCAT(1, 5150);
-            DreaptaDist(0.5, 590);
-            InainteDist(0.5, 220);
-            GhearaDeschide();
-            InapoiDist(0.5, 200);
-            DreaptaDist(0.5, 790);
-            InapoiDist(0.5, 920);
-
+            StangaDist(0.5, 1550);
         }
+
+
+//        LIFTURCAT(0.5, 1000);
+//        sleep(1000);
+//        LIFTCOBORAT(1, 500);
+
+
+//        if(autoCase == 1) {
+//            telemetry.addData("Status", "CAZ 1 - LEFT");
+//
+//            StangaDist(0.5, 550);
+//        }
+//
+//        else if(autoCase == 2) {
+//            telemetry.addData("Status", "CAZ 2");
+//
+//            DreaptaDist(0.5, 550);
+//        }
+//
+//        else if(autoCase == 3) {
+//            telemetry.addData("Status", "CAZ 3");
+//            DreaptaDist(0.5, 1400);
+//        }
 
 
     }
-
     void tagToTelemetry(AprilTagDetection detection)
     {
         telemetry.addLine(String.format("\nDetected tag ID=%d", detection.id));
@@ -288,7 +243,6 @@ public class OpModeLeft extends LinearOpMode  {
             LiftStanga.setTargetPosition(distance);
             LiftDreapta.setTargetPosition(distance);
 
-
             LiftStanga.setMode(DcMotor.RunMode.RUN_TO_POSITION);
             LiftDreapta.setMode(DcMotor.RunMode.RUN_TO_POSITION);
 
@@ -299,8 +253,8 @@ public class OpModeLeft extends LinearOpMode  {
 
             while(opModeIsActive() && LiftStanga.isBusy() && LiftDreapta.isBusy())
             {}
-            LiftStanga.setPower(0);
-            LiftDreapta.setPower(0);
+            LiftStanga.setPower(0.01);
+            LiftDreapta.setPower(-0.01);
 
             LiftStanga.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
             LiftDreapta.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
@@ -317,21 +271,21 @@ public class OpModeLeft extends LinearOpMode  {
             LiftTargetStanga = LiftStanga.getCurrentPosition();
             LiftTargetDreapta = LiftDreapta.getCurrentPosition();
 
-            LiftStanga.setTargetPosition(distance);
-            LiftDreapta.setTargetPosition(distance);
+            LiftStanga.setTargetPosition(-distance);
+            LiftDreapta.setTargetPosition(-distance);
 
             LiftStanga.setMode(DcMotor.RunMode.RUN_TO_POSITION);
             LiftDreapta.setMode(DcMotor.RunMode.RUN_TO_POSITION);
 
             runtime.reset();
 
-            LiftStanga.setPower(power);
-            LiftDreapta.setPower(power);
+            LiftStanga.setPower(-power);
+            LiftDreapta.setPower(-power);
 
             while(opModeIsActive() && LiftStanga.isBusy() && LiftDreapta.isBusy())
             {}
-            LiftStanga.setPower(0);
-            LiftDreapta.setPower(0);
+            LiftStanga.setPower(0.01);
+            LiftDreapta.setPower(-0.01);
 
             LiftStanga.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
             LiftDreapta.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
@@ -344,15 +298,15 @@ public class OpModeLeft extends LinearOpMode  {
 
     public void GhearaDeschide()
     {
-        ServoStanga.setPosition(GhearaValStangaOpen);
-        ServoDreapta.setPosition(GhearaValDreaptaOpen);
+        ServoStanga.setPosition(openClaw);
+        ServoDreapta.setPosition(openClaw);
         Stop();
     }
+
     public void GhearaInchide()
     {
-
-        ServoStanga.setPosition(GhearaValStangaClosed);
-        ServoDreapta.setPosition(GhearaValDreaptaClosed);
+        ServoStanga.setPosition(closeClaw);
+        ServoDreapta.setPosition(closeClaw);
         Stop();
     }
 
@@ -377,7 +331,9 @@ public class OpModeLeft extends LinearOpMode  {
 
         while(LeftFront.isBusy() && RightBack.isBusy() && RightFront.isBusy() && LeftBack.isBusy() )
         {}
+
         Stop();
+
         LeftFront.setMode(DcMotor.RunMode.RUN_USING_ENCODERS);
         RightFront.setMode(DcMotor.RunMode.RUN_USING_ENCODERS);
         LeftBack.setMode(DcMotor.RunMode.RUN_USING_ENCODERS);
@@ -426,7 +382,9 @@ public class OpModeLeft extends LinearOpMode  {
 
         while(LeftFront.isBusy() && RightBack.isBusy())
         {}
-        Stop();
+
+//        Stop();
+
         LeftFront.setMode(DcMotor.RunMode.RUN_USING_ENCODERS);
         RightBack.setMode(DcMotor.RunMode.RUN_USING_ENCODERS);
     }
@@ -447,7 +405,7 @@ public class OpModeLeft extends LinearOpMode  {
         while(RightFront.isBusy() && LeftBack.isBusy())
         {}
 
-        Stop();
+//        Stop();
 
         RightFront.setMode(DcMotor.RunMode.RUN_USING_ENCODERS);
         LeftBack.setMode(DcMotor.RunMode.RUN_USING_ENCODERS);
@@ -465,12 +423,13 @@ public class OpModeLeft extends LinearOpMode  {
         RightFront.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         LeftBack.setMode(DcMotor.RunMode.RUN_TO_POSITION);
 
+
         StangaInainte45(power);
 
         while(RightFront.isBusy() && LeftBack.isBusy())
         {}
 
-        Stop();
+//        Stop();
 
         RightFront.setMode(DcMotor.RunMode.RUN_USING_ENCODERS);
         LeftBack.setMode(DcMotor.RunMode.RUN_USING_ENCODERS);
@@ -492,7 +451,9 @@ public class OpModeLeft extends LinearOpMode  {
 
         while(LeftFront.isBusy() && RightBack.isBusy())
         {}
+
         Stop();
+
         LeftFront.setMode(DcMotor.RunMode.RUN_USING_ENCODERS);
         RightBack.setMode(DcMotor.RunMode.RUN_USING_ENCODERS);
     }
@@ -509,6 +470,8 @@ public class OpModeLeft extends LinearOpMode  {
         LeftBack.setTargetPosition(-distance);
         RightBack.setTargetPosition(distance);
 
+
+
         LeftFront.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         RightFront.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         LeftBack.setMode(DcMotor.RunMode.RUN_TO_POSITION);
@@ -518,7 +481,9 @@ public class OpModeLeft extends LinearOpMode  {
 
         while(LeftFront.isBusy() && RightFront.isBusy() && LeftBack.isBusy() && RightBack.isBusy())
         {}
+
         Stop();
+
         LeftFront.setMode(DcMotor.RunMode.RUN_USING_ENCODERS);
         RightFront.setMode(DcMotor.RunMode.RUN_USING_ENCODERS);
         LeftBack.setMode(DcMotor.RunMode.RUN_USING_ENCODERS);
