@@ -17,10 +17,12 @@ public class TeleOpSmash extends LinearOpMode {
 
     Gamepad.RumbleEffect StartTeleOP;
     Gamepad.RumbleEffect EndGame;
+    Gamepad.RumbleEffect STOP;
 
     ElapsedTime runtime = new ElapsedTime();
 
     final double HALF_TIME = 80.0;
+    final double STOP_GAME = 120.0;
 
     @Override
     public void runOpMode() throws InterruptedException {
@@ -33,7 +35,10 @@ public class TeleOpSmash extends LinearOpMode {
                 .build();
 
         EndGame = new Gamepad.RumbleEffect.Builder()
-                .addStep(0.5, 0.5, 1000)  //  Rumble right motor 100% for 500 mSec
+                .addStep(1, 1, 500)  //  Rumble right motor 100% for 500 mSec
+                .build();
+        STOP = new Gamepad.RumbleEffect.Builder()
+                .addStep(1, 1, 1000)  //  Rumble right motor 100% for 500 mSec
                 .build();
 
         runtime.reset();
@@ -50,11 +55,15 @@ public class TeleOpSmash extends LinearOpMode {
             telemetry.addData("Lift Target", robot.getLiftTarget());
             telemetry.addData("Lift Power", robot.getLiftPower());
 
-            while(runtime.seconds() < 1) {
+            if(runtime.seconds() < 1) {
                 gamepad1.runRumbleEffect(StartTeleOP);
                 gamepad2.runRumbleEffect(StartTeleOP);
             }
 
+            if(runtime.seconds() >=118.0 && runtime.seconds() <= STOP_GAME) {
+                gamepad1.runRumbleEffect(STOP);
+                gamepad2.runRumbleEffect(STOP);
+            }
             if ((runtime.seconds() > HALF_TIME) && !secondHalf)  {
                 gamepad1.runRumbleEffect(EndGame);
                 gamepad2.runRumbleEffect(EndGame);

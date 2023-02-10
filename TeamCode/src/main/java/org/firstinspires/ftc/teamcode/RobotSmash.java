@@ -147,10 +147,14 @@ public class RobotSmash {
         else if(gamepad.dpad_right) {setLiftTarget(ground); manualControl=false;}
 
 
-        double manualPower = (gamepad.left_trigger-gamepad.right_trigger+ff)*0.7;
+        double manualPower = (gamepad.left_trigger-gamepad.right_trigger+ff)*0.5;
 
         if(gamepad.left_trigger > 0.1 || gamepad.right_trigger > 0.1)
             manualControl=true;
+
+        if(gamepad.left_trigger > 0.9 || gamepad.right_trigger > 0.9)
+            manualPower = (gamepad.left_trigger-gamepad.right_trigger+ff)*0.7;
+
 
 //        pidController.setPID(kp, ki, kd);
         int armPos = LiftStanga.getCurrentPosition();

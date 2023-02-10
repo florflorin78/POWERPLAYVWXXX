@@ -174,7 +174,7 @@ public class OpModeLeft extends LinearOpMode  {
         InainteDist(0.5, 2050);
         LIFTURCAT(0.55, 1480);
         DreaptaDist(0.5, 585);
-        InainteDist(0.5, 200);
+        InainteDist(0.5, 230);
         sleep(1000);
         GhearaDeschide();
         InapoiDist(0.5, 200);
@@ -192,7 +192,7 @@ public class OpModeLeft extends LinearOpMode  {
 
         else if(autoCase == 3) {
             telemetry.addData("Status", "CAZ 3");
-            StangaDist(0.5, 1550);
+            StangaDist(0.5, 1700);
         }
 
 
