@@ -172,10 +172,10 @@ public class OpModeRight extends LinearOpMode  {
         LIFTURCAT(0.5, 250);
         DreaptaInainte45Dist(0.6, 480);
         InainteDist(0.5, 2050);
-        StangaDist(0.5, 585);
+        StangaDist(0.5, 580);
         LIFTURCAT(0.55, 1480);
-        InainteDist(0.5, 205);
-        sleep(1000);
+        InainteDist(0.5, 140);  //160
+        sleep(2000);
         GhearaDeschide();
         InapoiDist(0.5, 200);
 
