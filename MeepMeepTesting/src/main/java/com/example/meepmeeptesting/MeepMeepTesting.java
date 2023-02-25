@@ -13,8 +13,8 @@ import java.lang.invoke.VolatileCallSite;
 public class MeepMeepTesting {
 
     public  static double START_HEADING = 90.0;
-    public  static double START_X1 = 0;
-    public  static double START_Y1 = 0;
+    public  static double START_X1 = 23.5;
+    public  static double START_Y1 = -72;
     public  static double START_X2 = -23.5;
     public  static double START_Y2 = -72;
     public  static double PRELOAD_X = -31.6;
@@ -42,11 +42,18 @@ public class MeepMeepTesting {
 
         RoadRunnerBotEntity myBot = new DefaultBotBuilder(meepMeep)
                 .setColorScheme(new ColorSchemeRedDark())
-                .setConstraints(40, 30, Math.toRadians(226.25466078530798), Math.toRadians(184.02607784577722), 13.97)
-                .followTrajectorySequence(drive ->
-                        drive.trajectorySequenceBuilder(new Pose2d(START_X1, START_Y1, Math.toRadians(START_HEADING)))
+                .setConstraints(60, 45, Math.toRadians(226.25466078530798), Math.toRadians(184.02607784577722), 13.97)
 
-                                  .splineToSplineHeading(new Pose2d(0, 40, Math.toRadians(90)), Math.toRadians(0))
+                .followTrajectorySequence(drive ->
+                        drive.trajectorySequenceBuilder(new Pose2d(24, -4, Math.toRadians(110)))
+
+
+//                                  .splineToSplineHeading(new Pose2d(38, -45, Math.toRadians(90)), Math.toRadians(70))
+//                                  .splineToSplineHeading(new Pose2d(24, -4, Math.toRadians(110)), Math.toRadians(-200))
+                                .lineToLinearHeading (new Pose2d(35,-10,Math.toRadians(0)))
+
+
+
 //                                .strafeLeft(25)
 //                                .splineToLinearHeading(new Pose2d(15, 0, Math.toRadians(PRELOAD_HEADING)), Math.toRadians(70))
 //                                .strafeRight(2)
@@ -69,6 +76,7 @@ public class MeepMeepTesting {
 
 
                 );
+
 
         meepMeep.setBackground(MeepMeep.Background.FIELD_POWERPLAY_KAI_DARK)
                 .setDarkMode(true)
